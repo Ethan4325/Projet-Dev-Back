@@ -54,9 +54,18 @@ st.title("📊 Tableau de bord KPI")
 collections = ["Aucune", "products", "orders", "location", "customers"]
 selected_collection = st.sidebar.selectbox("Choisissez une collection pour filtrer les KPI :", collections)
 
+
+# Ajouter un filtre pour l'année dans la barre latérale
+selected_year = st.sidebar.selectbox(
+    "Choisissez une année pour filtrer les données :",
+    options=["Toutes les années", "2020", "2021", "2022", "2023"],
+    index=0  # Par défaut, "Toutes les années" est sélectionnée
+)
+
+
 # Afficher les KPI de la page d'accueil si aucune collection n'est sélectionnée
 if selected_collection == "Aucune":
-    st.markdown("## Page d'accueil - Résumé des KPI")
+    st.markdown("## Page d'accueil - Résumé des KPI Global 2020-2023")
 
     col1, col2, col3 = st.columns(3, gap="large")  # Ajusté pour 3 colonnes uniformes
 
@@ -114,6 +123,10 @@ if selected_collection == "Aucune":
         # Trier les données par Ventes Totales décroissantes
         df_cities = df_cities.sort_values(by="Ventes Totales ($)", ascending=False)
 
+        # Ajouter un index à partir de 1
+        df_cities.reset_index(drop=True, inplace=True)
+        df_cities.index = df_cities.index + 1  # Start index at 1
+
         # Afficher un tableau interactif
         st.dataframe(df_cities.style.format({"Ventes Totales ($)": "${:,.2f}"}), use_container_width=True)
     else:
@@ -123,14 +136,26 @@ if selected_collection == "Aucune":
 else:
     st.markdown(f"## Collection sélectionnée : {selected_collection.capitalize()}")
 
+# 6. Afficher les ventes totales par produit
     if selected_collection == "products":
         if st.sidebar.checkbox("Afficher les ventes totales par produit"):
             st.subheader("Ventes Totales par Produit")
             total_sales_data = fetch_data("Ventes_Totales_par_Produit")
             if total_sales_data:
+                # Conversion des données en DataFrame
                 df_sales = pd.DataFrame(total_sales_data)
+
+                # Truncate long product names for better display
                 df_sales["_id"] = df_sales["_id"].apply(lambda x: x[:30] + '...' if len(x) > 30 else x)
+
+                # Rename columns for better readability
                 df_sales.rename(columns={"_id": "Nom du Produit", "total_sales": "Ventes Totales ($)"}, inplace=True)
+
+                # Add an index starting from 1
+                df_sales.reset_index(drop=True, inplace=True)
+                df_sales.index = df_sales.index + 1  # Start index at 1
+
+                # Display the table with formatted numbers
                 st.dataframe(df_sales.style.format({"Ventes Totales ($)": "${:,.2f}"}), use_container_width=True)
 
     elif selected_collection == "orders":
@@ -154,6 +179,7 @@ else:
                 st.plotly_chart(fig, use_container_width=True)
 
 # Ajoutez d'autres visualisations spécifiques aux collections ici.
+
 # 7. Barplot annoté pour le Profit Total par Produit (dans products)
 if selected_collection == "products" and st.sidebar.checkbox("Afficher le profit total par produit"):
     st.subheader("Profit Total par Produit")
@@ -306,7 +332,7 @@ if selected_collection == "location" and st.sidebar.checkbox("Afficher les top 3
         st.write("Aucune donnée disponible.")
 
 
-# Section Customers : Nouveaux clients par mois
+# 12. Section Customers : Nouveaux clients par mois
 if selected_collection == "customers" and st.sidebar.checkbox("Afficher le nombre de nouveaux clients par mois"):
     st.subheader("Nombre de Nouveaux Clients par Mois")
     new_customers_data = fetch_data("Nombre_de_Nouveaux_Clients_par_Mois")
@@ -329,7 +355,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le nombr
     else:
         st.write("Aucune donnée disponible.")
 
-# Section Customers : Pourcentage de Clients Récurrents
+# 13. Section Customers : Pourcentage de Clients Récurrents
 if selected_collection == "customers" and st.sidebar.checkbox("Afficher le pourcentage de clients récurrents"):
     st.subheader("Pourcentage de Clients Récurrents")
     recurrent_clients_data = fetch_data("Pourcentage_de_clients_rÃ_currents")
@@ -349,7 +375,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le pourc
     else:
         st.write("Aucune donnée disponible.")
 
-# Section Customers : Segments de Clients
+# 14. Section Customers : Segments de Clients
 if selected_collection == "customers" and st.sidebar.checkbox("Afficher les segments de clients"):
     st.subheader("Segments de Clients")
     client_segments_data = fetch_data("Les_segments_de_clients")
@@ -381,7 +407,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher les segm
     else:
         st.write("Aucune donnée disponible.")
 
-# Section Customers : Total des Commandes par Nom de Client (Barres Verticales)
+# 15. Section Customers : Total des Commandes par Nom de Client (Barres Verticales)
 if selected_collection == "customers" and st.sidebar.checkbox("Afficher le total des commandes par client"):
     st.subheader("Total des Commandes par Client")
     total_orders_data = fetch_data("total_orders_by_customer_name")
@@ -418,7 +444,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le total
     else:
         st.write("Aucune donnée disponible.")
 
-#Classement des 5 meilleurs clients
+# 16. Classement des 5 meilleurs clients
 if selected_collection == "customers" and st.sidebar.checkbox("Afficher le classement des 5 meilleurs clients"):
     st.subheader("Classement des 5 Meilleurs Clients")
     top_customers_data = fetch_data("Classement des 5 meilleurs clients")  # Fetch the data from the FastAPI endpoint
@@ -432,12 +458,19 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le class
         # Remove brackets from customer names
         df_customers['Nom du Client'] = df_customers['Nom du Client'].apply(lambda x: ', '.join(x) if isinstance(x, list) else x)
 
-        # Display the table in Streamlit
-        st.table(df_customers)
+        # Sort customers by 'Total des Achats ($)' in descending order
+        df_customers = df_customers.sort_values(by='Total des Achats ($)', ascending=False)
+
+        # Reset index to start from 1
+        df_customers.reset_index(drop=True, inplace=True)
+        df_customers.index = df_customers.index + 1
+
+        # Display the table in Streamlit with proper formatting
+        st.table(df_customers.style.format({"Total des Achats ($)": "${:,.2f}"}))
     else:
         st.write("Aucune donnée disponible.")
 
-# Logique pour la collection "location"
+# 17. Logique pour la collection "location"
 if selected_collection == "location":
     if st.sidebar.checkbox("Afficher le nombre total des commandes par État (Top 10)"):
         st.subheader("Nombre Total des Commandes par État (Top 10)")
@@ -476,6 +509,7 @@ if selected_collection == "location":
         else:
             st.write("Aucune donnée disponible.")
 
+# 18. Afficher le temps moyen de livraison par région (Pyramide - Top 10)
     if st.sidebar.checkbox("Afficher le temps moyen de livraison par région (Pyramide - Top 10)"):
         st.subheader("Temps Moyen de Livraison par Région (Pyramide - Top 10)")
         avg_delivery_time_data = fetch_data("temps_moyen_de_livraison_par_région_par_jour")
@@ -520,22 +554,32 @@ if selected_collection == "location":
         else:
             st.write("Aucune donnée disponible.")
 
-    if st.sidebar.checkbox("Afficher la répartition des revenus par État (Tableau)"):
-        st.subheader("Répartition des Revenus par État (Tableau)")
-        revenue_by_state_data = fetch_data("répartition_des_revenus_par_state")
-        if revenue_by_state_data:
-            # Conversion des données en DataFrame
-            df_revenue_by_state = pd.DataFrame(revenue_by_state_data)
+# 19. Afficher la répartition des revenus par État (Tableau)
+    if selected_collection == "location":
+        if st.sidebar.checkbox("Afficher la répartition des revenus par État (Tableau)"):
+            st.subheader("Répartition des Revenus par État (Tableau)")
+            revenue_by_state_data = fetch_data("répartition_des_revenus_par_state")
+            if revenue_by_state_data:
+                # Conversion des données en DataFrame
+                df_revenue_by_state = pd.DataFrame(revenue_by_state_data)
 
-            # Renommer les colonnes pour une meilleure lisibilité
-            df_revenue_by_state.rename(columns={"state": "État", "totalRevenue": "Revenus Totaux ($)"}, inplace=True)
+                # Renommer les colonnes pour une meilleure lisibilité
+                df_revenue_by_state.rename(columns={"state": "État", "totalRevenue": "Revenus Totaux ($)"},
+                                           inplace=True)
 
-            # Trier les données par revenus décroissants
-            df_revenue_by_state = df_revenue_by_state.sort_values(by="Revenus Totaux ($)", ascending=False)
+                # Trier les données par revenus décroissants
+                df_revenue_by_state = df_revenue_by_state.sort_values(by="Revenus Totaux ($)", ascending=False)
 
-            # Afficher un tableau interactif
-            st.dataframe(df_revenue_by_state.style.format({"Revenus Totaux ($)": "${:,.2f}"}), use_container_width=True)
-        else:
-            st.write("Aucune donnée disponible.")
+                # Réinitialiser l'index et le faire commencer à 1
+                df_revenue_by_state.reset_index(drop=True, inplace=True)
+                df_revenue_by_state.index = df_revenue_by_state.index + 1
+
+                # Afficher un tableau interactif avec le bon format
+                st.dataframe(df_revenue_by_state.style.format({"Revenus Totaux ($)": "${:,.2f}"}),
+                             use_container_width=True)
+            else:
+                st.write("Aucune donnée disponible.")
+
+
 
 st.sidebar.markdown("Choisissez les indicateurs ci-dessus pour afficher leurs visualisations.")
