@@ -55,12 +55,6 @@ collections = ["Page d'accueil", "produit", "commandes", "localisation", "client
 selected_collection = st.sidebar.selectbox("Choisissez une collection pour filtrer les KPI :", collections)
 
 
-# Ajouter un filtre pour l'année dans la barre latérale
-selected_year = st.sidebar.selectbox(
-    "Choisissez une année pour filtrer les données :",
-    options=["Toutes les années", "2020", "2021", "2022", "2023"],
-    index=0  # Par défaut, "Toutes les années" est sélectionnée
-)
 
 
 # Afficher les KPI de la page d'accueil si aucune collection n'est sélectionnée
