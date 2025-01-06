@@ -51,7 +51,7 @@ st.markdown(
 st.title("📊 Tableau de bord KPI")
 
 # Ajouter une barre de sélection pour filtrer les collections
-collections = ["Aucune", "products", "orders", "location", "customers"]
+collections = ["Page d'accueil", "produit", "commandes", "localisation", "client"]
 selected_collection = st.sidebar.selectbox("Choisissez une collection pour filtrer les KPI :", collections)
 
 
@@ -64,7 +64,7 @@ selected_year = st.sidebar.selectbox(
 
 
 # Afficher les KPI de la page d'accueil si aucune collection n'est sélectionnée
-if selected_collection == "Aucune":
+if selected_collection == "Page d'accueil":
     st.markdown("## Page d'accueil - Résumé des KPI Global 2020-2023")
 
     col1, col2, col3 = st.columns(3, gap="large")  # Ajusté pour 3 colonnes uniformes
@@ -111,7 +111,8 @@ if selected_collection == "Aucune":
             unsafe_allow_html=True,
         )
 # Section pour les Top 5 Villes par Ventes
-    st.markdown("### Top 5 Villes par Ventes")
+if selected_collection == "localisation" and st.sidebar.checkbox("Afficher les Top 5 Villes par ventes"):
+    st.markdown("### Top 5 des Villes par Ventes")
     top_cities = fetch_data("top_5_villes")
     if top_cities:
         # Conversion des données en DataFrame
@@ -137,9 +138,9 @@ else:
     st.markdown(f"## Collection sélectionnée : {selected_collection.capitalize()}")
 
 # 6. Afficher les ventes totales par produit
-    if selected_collection == "products":
-        if st.sidebar.checkbox("Afficher les ventes totales par produit"):
-            st.subheader("Ventes Totales par Produit")
+    if selected_collection == "produit":
+        if st.sidebar.checkbox("Afficher les ventes totales par produit (Top 10)"):
+            st.subheader("Ventes Totales par Produit (Top 10)")
             total_sales_data = fetch_data("Ventes_Totales_par_Produit")
             if total_sales_data:
                 # Conversion des données en DataFrame
@@ -151,37 +152,20 @@ else:
                 # Rename columns for better readability
                 df_sales.rename(columns={"_id": "Nom du Produit", "total_sales": "Ventes Totales ($)"}, inplace=True)
 
-                # Add an index starting from 1
+                # Trier par "Ventes Totales ($)" en ordre décroissant
+                df_sales = df_sales.sort_values(by="Ventes Totales ($)", ascending=False).head(10)
+
+                # Ajouter un index qui commence à 1
                 df_sales.reset_index(drop=True, inplace=True)
-                df_sales.index = df_sales.index + 1  # Start index at 1
+                df_sales.index = df_sales.index + 1  # Index commence maintenant à 1
 
-                # Display the table with formatted numbers
+                # Afficher le tableau avec un formatage des chiffres
                 st.dataframe(df_sales.style.format({"Ventes Totales ($)": "${:,.2f}"}), use_container_width=True)
+            else:
+                st.write("Aucune donnée disponible pour les ventes totales par produit.")
 
-    elif selected_collection == "orders":
-        if st.sidebar.checkbox("Afficher le nombre de commandes par mois"):
-            st.subheader("Nombre de Commandes par Mois")
-            orders_per_month_data = fetch_data("number_of_order_per_month")
-            if orders_per_month_data:
-                df_orders_per_month = pd.DataFrame(orders_per_month_data)
-                df_orders_per_month['date'] = pd.to_datetime(df_orders_per_month[['year', 'month']].assign(day=1))
-                fig = px.line(
-                    df_orders_per_month,
-                    x='date',
-                    y='orderCount',
-                    title="Nombre de Commandes par Mois",
-                    labels={
-                        'date': 'Mois',
-                        'orderCount': 'Nombre de Commandes'
-                    },
-                    markers=True
-                )
-                st.plotly_chart(fig, use_container_width=True)
-
-# Ajoutez d'autres visualisations spécifiques aux collections ici.
-
-# 7. Barplot annoté pour le Profit Total par Produit (dans products)
-if selected_collection == "products" and st.sidebar.checkbox("Afficher le profit total par produit"):
+# 7. Camembert pour le Profit Total par Produit (dans products)
+if selected_collection == "produit" and st.sidebar.checkbox("Afficher le profit total par produit"):
     st.subheader("Profit Total par Produit")
     total_profit_data = fetch_data("Profit_Total_par_Produit")  # Appeler l'API pour obtenir les données de profit
     if total_profit_data:
@@ -204,17 +188,6 @@ if selected_collection == "products" and st.sidebar.checkbox("Afficher le profit
             colors=sns.color_palette("pastel"),  # Palette pastel pour des couleurs harmonieuses
         )
 
-        # Ajouter des flèches pour relier les labels
-        for i, text in enumerate(texts):
-            angle = (wedges[i].theta2 + wedges[i].theta1) / 2  # Angle moyen de la section
-            x = wedges[i].r * 1.2 * np.cos(np.radians(angle))  # Coordonnées X pour l'annotation
-            y = wedges[i].r * 1.2 * np.sin(np.radians(angle))  # Coordonnées Y pour l'annotation
-            ax.annotate(
-                "",
-                xy=(x, y),  # Position finale de la flèche
-                xytext=(0.85 * np.cos(np.radians(angle)), 0.85 * np.sin(np.radians(angle))),  # Origine
-                arrowprops=dict(arrowstyle="->", lw=1, color="black"),  # Style de la flèche
-            )
 
         # Titre du graphique
         ax.set_title("Répartition des Profits Totaux par Produit (Top 10)", fontsize=16)
@@ -225,7 +198,7 @@ if selected_collection == "products" and st.sidebar.checkbox("Afficher le profit
         st.write("Aucune donnée disponible.")
 
 # 8. Pie Chart pour la Performance des Produits par Catégorie (dans products)
-if selected_collection == "products" and st.sidebar.checkbox("Afficher la performance des produits par catégorie"):
+if selected_collection == "produit" and st.sidebar.checkbox("Afficher la performance des produits par catégorie"):
     st.subheader("Performance des Produits par Catégorie")
     performance_data = fetch_data("performance_des_produits_par_catégorie")
     if performance_data:
@@ -245,7 +218,7 @@ if selected_collection == "products" and st.sidebar.checkbox("Afficher la perfor
         st.write("Aucune donnée disponible.")
 
 # 9. Barplot horizontal pour les Produits les Plus Vendus (dans products)
-if selected_collection == "products" and st.sidebar.checkbox("Afficher les produits les plus vendus"):
+if selected_collection == "produit" and st.sidebar.checkbox("Afficher les produits les plus vendus"):
     st.subheader("Produits les Plus Vendus")
     top_products = fetch_data("produits-les-plus-vendus")
     if top_products:
@@ -277,7 +250,7 @@ if selected_collection == "products" and st.sidebar.checkbox("Afficher les produ
 
 
 # 10. Valeur des Ventes par Produit
-if selected_collection == "products" and st.sidebar.checkbox("Afficher la valeur moyenne des ventes par produit"):
+if selected_collection == "produit" and st.sidebar.checkbox("Afficher la valeur moyenne des ventes par produit"):
     st.subheader("Valeur Moyenne des Ventes par Produit")
     sales_value_data = fetch_data("Valeur_des_Ventes_par_Produit")
     if sales_value_data:
@@ -319,7 +292,7 @@ if selected_collection == "products" and st.sidebar.checkbox("Afficher la valeur
         st.write("Aucune donnée disponible.")
 
 # 11. Heatmap pour les Top Régions par Ventes (dans location)
-if selected_collection == "location" and st.sidebar.checkbox("Afficher les top 3 régions par ventes"):
+if selected_collection == "localisation" and st.sidebar.checkbox("Afficher les top 3 régions par ventes"):
     st.subheader("Top 3 Régions par Ventes")
     top_regions = fetch_data("top_3_region")
     if top_regions:
@@ -333,7 +306,7 @@ if selected_collection == "location" and st.sidebar.checkbox("Afficher les top 3
 
 
 # 12. Section Customers : Nouveaux clients par mois
-if selected_collection == "customers" and st.sidebar.checkbox("Afficher le nombre de nouveaux clients par mois"):
+if selected_collection == "client" and st.sidebar.checkbox("Afficher le nombre de nouveaux clients par mois"):
     st.subheader("Nombre de Nouveaux Clients par Mois")
     new_customers_data = fetch_data("Nombre_de_Nouveaux_Clients_par_Mois")
     if new_customers_data:
@@ -356,7 +329,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le nombr
         st.write("Aucune donnée disponible.")
 
 # 13. Section Customers : Pourcentage de Clients Récurrents
-if selected_collection == "customers" and st.sidebar.checkbox("Afficher le pourcentage de clients récurrents"):
+if selected_collection == "client" and st.sidebar.checkbox("Afficher le pourcentage de clients récurrents"):
     st.subheader("Pourcentage de Clients Récurrents")
     recurrent_clients_data = fetch_data("Pourcentage_de_clients_rÃ_currents")
     if recurrent_clients_data:
@@ -376,7 +349,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le pourc
         st.write("Aucune donnée disponible.")
 
 # 14. Section Customers : Segments de Clients
-if selected_collection == "customers" and st.sidebar.checkbox("Afficher les segments de clients"):
+if selected_collection == "client" and st.sidebar.checkbox("Afficher les segments de clients"):
     st.subheader("Segments de Clients")
     client_segments_data = fetch_data("Les_segments_de_clients")
     if client_segments_data:
@@ -408,7 +381,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher les segm
         st.write("Aucune donnée disponible.")
 
 # 15. Section Customers : Total des Commandes par Nom de Client (Barres Verticales)
-if selected_collection == "customers" and st.sidebar.checkbox("Afficher le total des commandes par client"):
+if selected_collection == "client" and st.sidebar.checkbox("Afficher le total des commandes par client"):
     st.subheader("Total des Commandes par Client")
     total_orders_data = fetch_data("total_orders_by_customer_name")
     if total_orders_data:
@@ -445,7 +418,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le total
         st.write("Aucune donnée disponible.")
 
 # 16. Classement des 5 meilleurs clients
-if selected_collection == "customers" and st.sidebar.checkbox("Afficher le classement des 5 meilleurs clients"):
+if selected_collection == "client" and st.sidebar.checkbox("Afficher le classement des 5 meilleurs clients"):
     st.subheader("Classement des 5 Meilleurs Clients")
     top_customers_data = fetch_data("Classement des 5 meilleurs clients")  # Fetch the data from the FastAPI endpoint
     if top_customers_data:
@@ -471,7 +444,7 @@ if selected_collection == "customers" and st.sidebar.checkbox("Afficher le class
         st.write("Aucune donnée disponible.")
 
 # 17. Logique pour la collection "location"
-if selected_collection == "location":
+if selected_collection == "localisation":
     if st.sidebar.checkbox("Afficher le nombre total des commandes par État (Top 10)"):
         st.subheader("Nombre Total des Commandes par État (Top 10)")
         orders_by_state_data = fetch_data("nombre_total_des_commandes_par_state")
@@ -555,7 +528,7 @@ if selected_collection == "location":
             st.write("Aucune donnée disponible.")
 
 # 19. Afficher la répartition des revenus par État (Tableau)
-    if selected_collection == "location":
+    if selected_collection == "localisation":
         if st.sidebar.checkbox("Afficher la répartition des revenus par État (Tableau)"):
             st.subheader("Répartition des Revenus par État (Tableau)")
             revenue_by_state_data = fetch_data("répartition_des_revenus_par_state")
@@ -580,6 +553,95 @@ if selected_collection == "location":
             else:
                 st.write("Aucune donnée disponible.")
 
+if selected_collection == "commandes":
+
+# 20. Répartition géographique des commandes par état
+    if st.sidebar.checkbox("Afficher la Répartition Géographique des Commandes par État"):
+        st.subheader("Répartition Géographique des Commandes par État")
+        geo_data = fetch_data("Répartition_géographique_des_commandes_par_état")
+        if geo_data:
+            # Convertir les données en DataFrame
+            df_geo = pd.DataFrame(geo_data)
+
+            # Trier les données en ordre décroissant par nombre total de commandes
+            df_geo = df_geo.sort_values(by="totalOrders", ascending=False)
+
+            # Réinitialiser les index pour commencer à 1
+            df_geo.reset_index(drop=True, inplace=True)
+            df_geo.index = df_geo.index + 1  # L'index commence maintenant à 1
+
+            # Afficher le tableau stylisé
+            st.dataframe(df_geo.style.format({"totalOrders": "{:,.0f}"}), use_container_width=True)
+
+            # Créer un graphique à barres trié en ordre décroissant
+            st.bar_chart(data=df_geo.set_index("state"), y="totalOrders", use_container_width=True)
+        else:
+            st.write("Aucune donnée disponible pour la répartition géographique des commandes.")
+
+# 21. Nombre moyen de produits par commande
+    if st.sidebar.checkbox("Afficher le Nombre Moyen de Produits par Commande"):
+        st.subheader("Nombre Moyen de Produits par Commande")
+        avg_products_data = fetch_data("Nombre moyen de produits par commande")
+        if avg_products_data:
+            avg_products = avg_products_data[0]["averageProductsPerOrder"]
+            st.markdown(
+                f"""
+                <div style="text-align: center; padding: 20px; border-radius: 10px; background-color: #E8F0FE; color: #1A73E8;">
+                    <h3>Nombre Moyen de Produits par Commande</h3>
+                    <p style="font-size: 24px; font-weight: bold;">{avg_products:.2f}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.write("Aucune donnée disponible pour le nombre moyen de produits par commande.")
+
+# 22.Durée moyenne entre deux commandes du même client
+    if st.sidebar.checkbox("Afficher la Durée Moyenne entre Deux Commandes"):
+        st.subheader("Durée Moyenne entre Deux Commandes du Même Client")
+        avg_time_data = fetch_data("Durée moyenne entre deux commandes du même client")
+        if avg_time_data:
+            avg_time = avg_time_data[0]["avgTimeBetweenOrdersInDays"]
+            st.markdown(
+                f"""
+                <div style="text-align: center; padding: 20px; border-radius: 10px; background-color: #FFF3E0; color: #FB8C00;">
+                    <h3>Durée Moyenne entre Commandes (en jours)</h3>
+                    <p style="font-size: 24px; font-weight: bold;">{avg_time:.2f} jours</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.write("Aucune donnée disponible pour la durée moyenne entre commandes.")
+
+if selected_collection == "commandes":
+
+    # Carte pour la Valeur Moyenne par Commande
+    if st.sidebar.checkbox("Afficher la Valeur Moyenne par Commande"):
+        st.subheader("Valeur Moyenne par Commande")
+        avg_order_value_data = fetch_data("Valeur_Moyenne_Par_Commandes")
+        if avg_order_value_data:
+            avg_order_value = avg_order_value_data[0]["avgSales"]
+            # Carte avec style personnalisé
+            st.markdown(
+                f"""
+                <div style="
+                    text-align: center;
+                    padding: 20px;
+                    border-radius: 15px;
+                    background-color: #f8f9fa;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                ">
+                    <h3 style="color: #007bff;">Valeur Moyenne par Commande</h3>
+                    <p style="font-size: 28px; font-weight: bold; color: #28a745;">
+                        ${avg_order_value:,.2f}
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        else:
+            st.error("Aucune donnée disponible pour la valeur moyenne par commande.")
 
 
 st.sidebar.markdown("Choisissez les indicateurs ci-dessus pour afficher leurs visualisations.")

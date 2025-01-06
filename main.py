@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from pymongo import MongoClient
-from typing import List, Dict
 
 # Initialisation de FastAPI
 app = FastAPI()
@@ -305,6 +304,7 @@ async def total_revenue():
         }
     }
 ]
+
     result = list(db.orders.aggregate(pipeline))
     return result
 
@@ -1003,6 +1003,232 @@ async def répartition_des_revenus_par_state():
             '_id': 0,
             'state': '$_id',
             'totalRevenue': 1
+        }
+    }
+]
+
+    result = list(db.orders.aggregate(pipeline))
+    return result
+
+
+@app.get("/kpi/Répartition_géographique_des_commandes_par_état")
+async def Répartition_géographique_des_commandes_par_état():
+ pipeline = [
+         {
+             '$lookup': {
+                 'from': 'Customers',
+                 'localField': 'Customer ID',
+                 'foreignField': 'Customer ID',
+                 'as': 'CustomersDetails'
+             }
+         }, {
+         '$lookup': {
+             'from': 'locations',
+             'localField': 'Postal Code',
+             'foreignField': 'Postal Code',
+             'as': 'locationdetails'
+         }
+     }, {
+         '$lookup': {
+             'from': 'Products',
+             'localField': 'Product ID',
+             'foreignField': 'Product ID',
+             'as': 'ProductsDetail'
+         }
+     }, {
+         '$addFields': {
+             'State': {
+                 '$arrayElemAt': [
+                     '$locationdetails.State', 0
+                 ]
+             }
+         }
+     }, {
+         '$group': {
+             '_id': '$State',
+             'totalOrders': {
+                 '$sum': 1
+             }
+         }
+     }, {
+         '$project': {
+             '_id': 0,
+             'state': '$_id',
+             'totalOrders': 1
+         }
+     }
+]
+ result = list(db.orders.aggregate(pipeline))
+ return result
+
+@app.get("/kpi/Nombre moyen de produits par commande")
+def Nombre_moyen_de_produits_par_commande():
+    pipeline = [
+    {
+        '$lookup': {
+            'from': 'Products',
+            'localField': 'Products ID',
+            'foreignField': 'Products ID',
+            'as': 'ProductsDetails'
+        }
+    }, {
+        '$group': {
+            '_id': '$Order ID',
+            'totalProducts': {
+                '$sum': '$Quantity'
+            }
+        }
+    }, {
+        '$group': {
+            '_id': None,
+            'averageProductsPerOrder': {
+                '$avg': '$totalProducts'
+            }
+        }
+    }, {
+        '$project': {
+            '_id': 0,
+            'averageProductsPerOrder': 1
+        }
+    }
+]
+    result = list(db.orders.aggregate(pipeline))
+    return result
+
+@app.get("/kpi/Durée moyenne entre deux commandes du même client")
+def Durée_moyenne_entre_deux_commandes_du_même_client():
+    pipeline = [
+    {
+        '$sort': {
+            'Customer ID': 1,
+            'Order Date': 1
+        }
+    }, {
+        '$group': {
+            '_id': '$Customer ID',
+            'orderDates': {
+                '$push': '$Order Date'
+            }
+        }
+    }, {
+        '$project': {
+            'timeDiffs': {
+                '$map': {
+                    'input': {
+                        '$zip': {
+                            'inputs': [
+                                {
+                                    '$slice': [
+                                        '$orderDates', 1, {
+                                            '$size': '$orderDates'
+                                        }
+                                    ]
+                                }, {
+                                    '$slice': [
+                                        '$orderDates', {
+                                            '$subtract': [
+                                                {
+                                                    '$size': '$orderDates'
+                                                }, 1
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    'as': 'pair',
+                    'in': {
+                        '$subtract': [
+                            {
+                                '$arrayElemAt': [
+                                    '$$pair', 0
+                                ]
+                            }, {
+                                '$arrayElemAt': [
+                                    '$$pair', 1
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }, {
+        '$unwind': '$timeDiffs'
+    }, {
+        '$group': {
+            '_id': None,
+            'avgTimeBetweenOrders': {
+                '$avg': '$timeDiffs'
+            }
+        }
+    }, {
+        '$project': {
+            '_id': 0,
+            'avgTimeBetweenOrdersInDays': {
+                '$divide': [
+                    {
+                        '$toLong': '$avgTimeBetweenOrders'
+                    }, 1000 * 60 * 60 * 24
+                ]
+            }
+        }
+    }
+]
+    result = list(db.orders.aggregate(pipeline))
+    return result
+
+@app.get("/kpi/Valeur_Moyenne_Par_Commandes")
+def Valeur_Moyenne_Par_Commandes():
+    pipeline = [
+    {
+        '$lookup': {
+            'from': 'Customers',
+            'localField': 'Customer ID',
+            'foreignField': 'Customer ID',
+            'as': 'CustomersDetails'
+        }
+    }, {
+        '$lookup': {
+            'from': 'Products',
+            'localField': 'Products ID',
+            'foreignField': 'Products ID',
+            'as': 'ProductsDetails'
+        }
+    }, {
+        '$lookup': {
+            'from': 'Location',
+            'localField': 'Postal Code',
+            'foreignField': 'Postal Code',
+            'as': 'LocationsDetails'
+        }
+    }, {
+        '$group': {
+            '_id': '$Order ID',
+            'totalSales': {
+                '$sum': {
+                    '$multiply': [
+                        '$Sales', {
+                            '$subtract': [
+                                1, '$Discount'
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }, {
+        '$group': {
+            '_id': None,
+            'avgSales': {
+                '$avg': '$totalSales'
+            }
+        }
+    }, {
+        '$project': {
+            '_id': 0,
+            'avgSales': 1
         }
     }
 ]
