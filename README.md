@@ -54,7 +54,7 @@ Voici les différentes étapes d'installation permettant de faire fonctionner le
 - Etape 3 : Installer toutes les bibliothèques nécessaires listées dans le fichier requirements.txt. Ainsi, cela va automatiquement installer pymongo pour interagir avec MongoDB, fastapi pour gérer l'API et streamlit pour l'interface de visualisation.
 - Etape 4 : Lancer le serveur MongoDB
 - Etape 5 : Importer les données dans MongoDB
-- Etape § : Démarrer l'API FastAPI, qui permettra de récupérer les KPI depuis la base de données.
+- Etape 6 : Démarrer l'API FastAPI, qui permettra de récupérer les KPI depuis la base de données.
 - Etape 7 : Lancer l'interface Streamlit, pour visualiser les KPI et graphiques 
 
 ## Description des fichiers du projet : 
