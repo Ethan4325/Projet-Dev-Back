@@ -510,8 +510,8 @@ def Average_sales_per_order():
     result = list(db.orders.aggregate(pipeline))
     return result
 
-@app.get("/kpi/number_of_order_per_month")
-def number_of_order_per_month():
+@app.get("/kpi/nombre_de_commandes_par_mois")
+def nombre_de_commandes_par_mois():
     pipeline = [
     {
         '$group': {

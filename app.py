@@ -548,31 +548,43 @@ if selected_collection == "localisation":
                 st.write("Aucune donnée disponible.")
 
 if selected_collection == "commandes":
+# Afficher le nombre de commandes par mois
+    if selected_collection == "commandes":
+        if st.sidebar.checkbox("Afficher le Nombre de Commandes par Mois"):
+            st.subheader("Nombre de Commandes par Mois")
 
-# 20. Répartition géographique des commandes par état
-    if st.sidebar.checkbox("Afficher la Répartition Géographique des Commandes par État"):
-        st.subheader("Répartition Géographique des Commandes par État")
-        geo_data = fetch_data("Répartition_géographique_des_commandes_par_état")
-        if geo_data:
-            # Convertir les données en DataFrame
-            df_geo = pd.DataFrame(geo_data)
+            # Récupération des données via l'API
+            orders_per_month_data = fetch_data("nombre_de_commandes_par_mois")
 
-            # Trier les données en ordre décroissant par nombre total de commandes
-            df_geo = df_geo.sort_values(by="totalOrders", ascending=False)
+            if orders_per_month_data:
+                # Conversion des données en DataFrame
+                df_orders_per_month = pd.DataFrame(orders_per_month_data)
 
-            # Réinitialiser les index pour commencer à 1
-            df_geo.reset_index(drop=True, inplace=True)
-            df_geo.index = df_geo.index + 1  # L'index commence maintenant à 1
+                # Conversion des colonnes `year` et `month` en une colonne de type datetime
+                df_orders_per_month['date'] = pd.to_datetime(df_orders_per_month[['year', 'month']].assign(day=1))
 
-            # Afficher le tableau stylisé
-            st.dataframe(df_geo.style.format({"totalOrders": "{:,.0f}"}), use_container_width=True)
+                # Tri des données par date pour garantir l'ordre chronologique
+                df_orders_per_month = df_orders_per_month.sort_values(by="date")
 
-            # Créer un graphique à barres trié en ordre décroissant
-            st.bar_chart(data=df_geo.set_index("state"), y="totalOrders", use_container_width=True)
-        else:
-            st.write("Aucune donnée disponible pour la répartition géographique des commandes.")
+                # Création d'une ligne graphique pour visualiser les commandes par mois
+                fig = px.line(
+                    df_orders_per_month,
+                    x='date',
+                    y='orderCount',
+                    title="Nombre de Commandes par Mois",
+                    labels={
+                        'date': 'Mois',
+                        'orderCount': 'Nombre de Commandes'
+                    },
+                    markers=True
+                )
 
-# 21. Nombre moyen de produits par commande
+                # Affichage du graphique dans Streamlit
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.error("Aucune donnée disponible pour le nombre de commandes par mois.")
+
+    # 21. Nombre moyen de produits par commande
     if st.sidebar.checkbox("Afficher le Nombre Moyen de Produits par Commande"):
         st.subheader("Nombre Moyen de Produits par Commande")
         avg_products_data = fetch_data("Nombre moyen de produits par commande")
