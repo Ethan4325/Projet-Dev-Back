@@ -6,6 +6,6 @@ pandas
 pytest
 seaborn
 numpy
-plotly.express
-matplotlib.pyplot
+plotly
+matplotlib
 requests
