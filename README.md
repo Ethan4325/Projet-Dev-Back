@@ -50,13 +50,23 @@ Les prérequis, c'est-à-dire les outils nécessaires au bon fonctionnement du p
 Voici les différentes étapes d'installation permettant de faire fonctionner le projet : 
 
 - Etape 1 : Récupérer le projet depuis le dépôt GitHub
-- Etape 2 : Créer un environnement virtuel
+- Etape 2 : Créer un environnement virtuel:
+  python -m venv env
+source env/bin/activate  # Sous Linux/Mac
+env\Scripts\activate     # Sous Windows
+
 - Etape 3 : Installer toutes les bibliothèques nécessaires listées dans le fichier requirements.txt. Ainsi, cela va automatiquement installer pymongo pour interagir avec MongoDB, fastapi pour gérer l'API et streamlit pour l'interface de visualisation.
+  pip install -r requirements.txt
+
 - Etape 4 : Lancer le serveur MongoDB
 - Etape 5 : Importer les données dans MongoDB
-- Etape 6 : Démarrer l'API FastAPI, qui permettra de récupérer les KPI depuis la base de données: uvicorn main:app --reload
+  python import_data.py
 
-- Etape 7 : Lancer l'interface Streamlit, pour visualiser les KPI et graphiques: streamlit run app.py
+- Etape 6 : Démarrer l'API FastAPI, qui permettra de récupérer les KPI depuis la base de données:
+  uvicorn main:app --reload
+
+- Etape 7 : Lancer l'interface Streamlit, pour visualiser les KPI et graphiques:
+  streamlit run app.py
 
 ## Description des fichiers du projet : 
 Voici une brève description des fichiers qui se situent au sein de notre dépôt : 
@@ -68,7 +78,6 @@ Voici une brève description des fichiers qui se situent au sein de notre dépô
 - requirements.txt : Ce fichier contient la liste complète des bibliothèques Python nécessaires pour faire fonctionner le projet. Pour les installer, il suffit d'utiliser la commande suivante : pip install -r requirements.txt.
 
 ## Etapes d'exécution du code : 
-
-
-
+- Lancer l'API :Exécutez la commande uvicorn main:app --reload pour démarrer le backend FastAPI.
+- Démarrer Streamlit : Lancer l'application Streamlit avec la commande streamlit run app.py pour la visualisation.
 
