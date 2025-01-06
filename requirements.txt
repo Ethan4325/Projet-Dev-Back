@@ -4,3 +4,8 @@ uvicorn
 streamlit
 pandas
 pytest
+seaborn
+numpy
+plotly.express
+matplotlib.pyplot
+requests
