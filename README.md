@@ -44,10 +44,7 @@ uvicorn app:app --reload
 Launch Streamlit dashboard:
 
 streamlit run app.py
-#### 🌐 Application URLs
 
-FastAPI Docs: http://127.0.0.1:8000/docs
-Streamlit Dashboard: http://localhost:8501
 #### 📂 Project Structure
 
 Projet-Dev-Back/
