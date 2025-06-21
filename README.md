@@ -1,61 +1,81 @@
-# 🧪 Projet-Dev-Back: Data Analysis & Visualization with MongoDB, FastAPI, and Streamlit
+# 🧪 Projet-Dev-Back: Data Analysis & Visualization with MongoDB, FastAPI & Streamlit
+
+Welcome to Projet-Dev-Back, a full-stack data pipeline project that combines MongoDB, FastAPI, and Streamlit to demonstrate modern data storage, API creation, and real-time visualization. This project simulates an end-to-end workflow — from data ingestion to interactive dashboards — ideal for data science and backend development practice.
 
 ## 📘 Project Overview
 
-Welcome to Projet-Dev-Back! This project demonstrates how to build a modern data analysis and visualization pipeline using:
+Core Components:
 
-MongoDB: A NoSQL database for flexible and scalable data storage.
-FastAPI: A high-performance web framework for building APIs.
-Streamlit: A tool for creating interactive web applications for data science.
-The goal is to explore and understand data by leveraging these technologies to store, process, and visualize information in an intuitive and efficient manner.
+MongoDB – Flexible NoSQL database for storing structured and semi-structured data
+FastAPI – Lightweight, fast web framework for creating robust RESTful APIs
+Streamlit – Python framework for building intuitive, interactive web apps
+The objective is to store, retrieve, and visualize data in an efficient and scalable way, ideal for exploratory analysis or backend dashboards.
 
 ### 🎯 Objectives
 
-The project aims to cover the following key steps in data management and visualization:
+This project walks through the key stages of backend data handling:
 
-MongoDB Setup: Configure MongoDB to store data flexibly.
-Data Import: Import data into MongoDB for processing.
-API Development: Use FastAPI to create APIs for data extraction and analysis.
-Data Visualization: Utilize Streamlit to build an interactive dashboard for data presentation.
-🛠️ Technologies Used
+MongoDB Setup – Configure a local or remote MongoDB instance to store sample data
+Data Import – Use Python to populate the database with structured datasets
+API Development – Create RESTful API endpoints using FastAPI for querying and filtering
+Visualization – Build a clean, interactive dashboard with Streamlit
+#### 🛠️ Tech Stack
 
-MongoDB: NoSQL database for data storage.
-FastAPI: Web framework for building APIs.
-Streamlit: Framework for creating interactive web applications.
-Python: Programming language for scripting and development.
-### 🚀 Getting Started
+Python 3.8+
+MongoDB
+FastAPI
+Streamlit
+Uvicorn
+Pymongo
+#### 🚀 Getting Started
 
-#### To run the project locally, follow these steps 📝:
-
-Clone the Repository:
+#### 🧰 Clone the Repository
 git clone https://github.com/Ethan4325/Projet-Dev-Back.git
 cd Projet-Dev-Back
-Set Up a Virtual Environment:
+#### 🐍 Set Up Virtual Environment
 python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-Install Dependencies:
+source venv/bin/activate     # For Windows: venv\Scripts\activate
+#### 📦 Install Dependencies
 pip install -r requirements.txt
-Run the Application:
-To start the FastAPI server:
+#### ▶️ Run the Applications
+Start FastAPI backend:
+
 uvicorn app:app --reload
-To launch the Streamlit dashboard:
+Launch Streamlit dashboard:
+
 streamlit run app.py
-Access the Application:
-FastAPI docs: http://127.0.0.1:8000/docs
-Streamlit dashboard: http://localhost:8501
-📂 Project Structure
+#### 🌐 Application URLs
+
+FastAPI Docs: http://127.0.0.1:8000/docs
+Streamlit Dashboard: http://localhost:8501
+#### 📂 Project Structure
 
 Projet-Dev-Back/
-│
-├── app.py              # FastAPI application
-├── import_data.py      # Script for importing data into MongoDB
-├── main.py             # Main script for data processing
-├── requirements.txt    # Python dependencies
-└── README.md           # Project documentation
+├── app.py              # FastAPI application logic
+├── main.py             # Data logic / utilities
+├── import_data.py      # MongoDB data importer
+├── requirements.txt    # Python packages
+└── README.md           # Documentation
 #### 🧪 Sample Data
 
-The project includes sample data to demonstrate the functionality. You can import this data into MongoDB using the provided import_data.py script.
+Sample datasets are included (or referenced) for demo purposes. You can populate the MongoDB database using:
 
-#### 📈 Visualizations
+python import_data.py
+Make sure your MongoDB instance is running and accessible locally (e.g., mongodb://localhost:27017).
 
-The Streamlit dashboard provides interactive visualizations of the data. You can filter and explore the data through various charts and graphs.
+#### 📈 Streamlit Dashboard
+
+The dashboard allows users to:
+
+View summary stats and trends
+Filter data by parameters
+Visualize patterns through bar charts, line graphs, etc.
+Add screenshots or GIF previews here for visual appeal.
+
+#### 🤝 Contributing
+
+Contributions are welcome! If you want to add new features, optimize queries, or improve the UI:
+
+Fork this repo
+Create a new branch
+Submit a pull request
