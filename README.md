@@ -1,83 +1,61 @@
-# Analyse et Visualisation de données avec MongoDB,FastAPI et Streamlit
+# 🧪 Projet-Dev-Back: Data Analysis & Visualization with MongoDB, FastAPI, and Streamlit
 
-## Description du projet :
-Ce projet a pour but d'explorer et comprendre les données en utilisant des outils modernes tels que MongoDB, logiciel dans lequel nous stockons et manipulons les informations. Par ailleurs, FastAPI nous permet de créer des API performantes pour extraire et analyser ces données, tandis que Streamlit offre une interface visuelle simple et intuitive pour présenter de manière claire et interactive.
+## 📘 Project Overview
 
+Welcome to Projet-Dev-Back! This project demonstrates how to build a modern data analysis and visualization pipeline using:
 
-## Objectifs : 
-L'objectif de ce projet est d'explorer différentes étapes clés de la gestion et de la visualisation de données :
+MongoDB: A NoSQL database for flexible and scalable data storage.
+FastAPI: A high-performance web framework for building APIs.
+Streamlit: A tool for creating interactive web applications for data science.
+The goal is to explore and understand data by leveraging these technologies to store, process, and visualize information in an intuitive and efficient manner.
 
-- Configurer MongoDB : pour stocker des données de manière flexible.
-- Importer des données CSV : pour les organiser efficacement dans la base.
-- Créer une API performante avec FastAPI : pour extraire et manipuler les données en temps réel.
-- Visualiser les résultats via Streamlit : un outil interactif qui rend les données compréhensibles et accessibles.
+### 🎯 Objectives
 
-## Technologies utilisées : 
-- Pourquoi MongoDB ?
+The project aims to cover the following key steps in data management and visualization:
 
-On a choisi MongoDB parce qu'il est simple et flexible. C'est une base de données NoSQL, parfaite pour gérer des fichiers CSV et des données sous forme de documents JSON, ce qui correspond parfaitement au projet. Sa structure permet de stocker, organiser et manipuler les données sans avoir à définir un schéma.
+MongoDB Setup: Configure MongoDB to store data flexibly.
+Data Import: Import data into MongoDB for processing.
+API Development: Use FastAPI to create APIs for data extraction and analysis.
+Data Visualization: Utilize Streamlit to build an interactive dashboard for data presentation.
+🛠️ Technologies Used
 
-À quoi ça sert dans le projet ?
+MongoDB: NoSQL database for data storage.
+FastAPI: Web framework for building APIs.
+Streamlit: Framework for creating interactive web applications.
+Python: Programming language for scripting and development.
+### 🚀 Getting Started
 
-MongoDB sert à stocker toutes les données utilisées dans le projet (exemple : produits, commandes, clients...). Il permet de conserver l'ensemble des informations et de les rendre accessibles pour les requêtes et l'analyse.
+#### To run the project locally, follow these steps 📝:
 
-- Pourquoi FastAPI ?
+Clone the Repository:
+git clone https://github.com/Ethan4325/Projet-Dev-Back.git
+cd Projet-Dev-Back
+Set Up a Virtual Environment:
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+Install Dependencies:
+pip install -r requirements.txt
+Run the Application:
+To start the FastAPI server:
+uvicorn app:app --reload
+To launch the Streamlit dashboard:
+streamlit run app.py
+Access the Application:
+FastAPI docs: http://127.0.0.1:8000/docs
+Streamlit dashboard: http://localhost:8501
+📂 Project Structure
 
-On a opté pour FastAPI car il est rapide et moderne pour développer des API. En effet nous avons pu créer des routes web qui ont permi d'interagir avec les données stockées dans MongoDB en quelques lignes de code. Ce que nous avons apprécie, c'est sa documentation automatique via Swagger UI, qui simplifie les tests des requêtes directement depuis le navigateur.
+Projet-Dev-Back/
+│
+├── app.py              # FastAPI application
+├── import_data.py      # Script for importing data into MongoDB
+├── main.py             # Main script for data processing
+├── requirements.txt    # Python dependencies
+└── README.md           # Project documentation
+#### 🧪 Sample Data
 
-À quoi ça sert dans le projet ?
+The project includes sample data to demonstrate the functionality. You can import this data into MongoDB using the provided import_data.py script.
 
-FastAPI est utilisé pour exposer les données via une API web. Il permet de créer des points d'accès pour récupérer des indicateurs clés de performance (KPI) à partir de la base de données MongoDB.
+#### 📈 Visualizations
 
-- Pourquoi Streamlit ?
-
-On a choisi Streamlit car il permet de créer des interfaces web interactives en toute simplicité, sans avoir besoin de coder. En effet grâce à Streamlit, nous avons pu afficher des graphiques, tableaux et indicateurs visuels.
-
-À quoi ça sert dans le projet ?
-
-Streamlit est utilisé pour visualiser les données et KPI de manière claire. Il offre une interface utilisateur interactive qui permet de mieux comprendre les résultats d'analyse et de rendre la présentation plus parlante.
-
-## Prérequis :
-Les prérequis, c'est-à-dire les outils nécessaires au bon fonctionnement du projet sont les suivants :
-
-- Python 3 : c'est le langage de programmation utilisé pour le projet.
-- MongoDB Community Edition : c'est la base de données NoSQL pour stocker les données.
-- Streamlit : c'est une bibliothèque python qui permet de créer des interfaces web interactives.
-- FastAPI : c'est un framework python utiliser pour la création d'API rapides et performantes.
-
-## Installation
-
-Voici les différentes étapes d'installation permettant de faire fonctionner le projet : 
-
-- Etape 1 : Récupérer le projet depuis le dépôt GitHub
-- Etape 2 : Créer un environnement virtuel:
-  python -m venv env
-source env/bin/activate  # Sous Linux/Mac
-env\Scripts\activate     # Sous Windows
-
-- Etape 3 : Installer toutes les bibliothèques nécessaires listées dans le fichier requirements.txt. Ainsi, cela va automatiquement installer pymongo pour interagir avec MongoDB, fastapi pour gérer l'API et streamlit pour l'interface de visualisation.
-  pip install -r requirements.txt
-
-- Etape 4 : Lancer le serveur MongoDB
-- Etape 5 : Importer les données dans MongoDB
-  python import_data.py
-
-- Etape 6 : Démarrer l'API FastAPI, qui permettra de récupérer les KPI depuis la base de données:
-  uvicorn main:app --reload
-
-- Etape 7 : Lancer l'interface Streamlit, pour visualiser les KPI et graphiques:
-  streamlit run app.py
-
-## Description des fichiers du projet : 
-Voici une brève description des fichiers qui se situent au sein de notre dépôt : 
-
-- app.py : Ce fichier gère l'application Streamlit. Il permet d'afficher les données de manière visuelle et interactive, permettant d'explorer les KPI et comprendre les résultats.
-- main.py : Ce fichier est le cœur de l'API FastAPI. Il définit les différentes routes permettant de récupérer et manipuler les données stockées dans MongoDB. C'est ce fichier qui permet d'exposer les données via des requêtes web.
-- import_data.py : Ce fichier est un script Python utilisé pour importer les fichiers CSV dans MongoDB. Il facilite la préparation et l'intégration des données afin qu'elles soient prêtes à être utilisées dans l'application.
-- mongodb_aggregation.py : Dans ce fichier, on trouve des requêtes d'agrégation MongoDB. Il sert à effectuer des calculs et des analyses avancées sur les données, comme la génération de statistiques et d'indicateurs clés.
-- requirements.txt : Ce fichier contient la liste complète des bibliothèques Python nécessaires pour faire fonctionner le projet. Pour les installer, il suffit d'utiliser la commande suivante : pip install -r requirements.txt.
-
-## Etapes d'exécution du code : 
-- Lancer l'API :Exécutez la commande uvicorn main:app --reload pour démarrer le backend FastAPI.
-- Démarrer Streamlit : Lancer l'application Streamlit avec la commande streamlit run app.py pour la visualisation.
-
+The Streamlit dashboard provides interactive visualizations of the data. You can filter and explore the data through various charts and graphs.
